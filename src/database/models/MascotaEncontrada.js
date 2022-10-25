@@ -1,7 +1,7 @@
 module.exports = (sequelize, dataTypes) => {
-    let alias = 'Mascota';
+    let alias = 'MascotaEncontrada';
     let cols = {
-        idMascota: {
+        idEncontrada: {
             type: dataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
@@ -9,11 +9,11 @@ module.exports = (sequelize, dataTypes) => {
         idHumano: {
             type: dataTypes.STRING
         },
-        nombre: {
-            type: dataTypes.STRING
-        },
         descripcion: {
             type: dataTypes.INTEGER
+        },
+        pesoAproximado: {
+            type: dataTypes.STRING
         },
         status: {
             type: dataTypes.STRING
@@ -29,29 +29,21 @@ module.exports = (sequelize, dataTypes) => {
         },
         tipoMascota: {
             type: dataTypes.STRING
-        },
-        pesoAproximado: {
-            type: dataTypes.STRING
-        },
-        latPerdida: {
-            type: dataTypes.DECIMAL
-        },
-        lngPerdida: {
-            type: dataTypes.DECIMAL
-        },
+        },     
         latEncontrada: {
             type: dataTypes.DECIMAL
         },
         lngEncontrada: {
             type: dataTypes.DECIMAL
         },
+        
     };
     let config = {
-        tableName: 'mascotas',
+        tableName: 'mascotasencontradas',
         timestamps: false
     };
-    const Mascota = sequelize.define(alias, cols, config)
+    const MascotaEncontrada = sequelize.define(alias, cols, config)
 
-    return Mascota
+    return MascotaEncontrada
 
 }
