@@ -27,13 +27,15 @@ const upload = multer({ storage })
 
 
 router.post("/mascota/register", upload.single('file'), async (req, res) => {
+    console.log(req.body)
     console.log(req.headers)
     await Mascota.create({
-        idHumano: req.headers.id,
         nombre: req.headers.nombre,
-        pesoAproximado: req.headers.pesoaproximado,
+        idHumano: req.headers.id,
         colorPrimario: req.headers.colorprimario,
         colorSecundario: req.headers.colorsecundario,
+        pesoAproximado: req.headers.pesoaproximado,
+        status: 0,
         tipoMascota: req.headers.tipomascota,
         descripcion: req.headers.descripcionmascota,
         fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
@@ -45,10 +47,10 @@ router.get("/mascotas/getById/:id", async (req, res) => {
     console.log(req.body)
     await Mascota.findAll({
         where: {
-           /*  idHumano: req.params.id, */
-            status:{[Op.ne]:1}
-              
-            
+            /*  idHumano: req.params.id, */
+            /*   status:{[Op.ne]:1} */
+
+
         }
     }).then(await function (mascotas) {
         return res.status(200).send({ data: mascotas })
@@ -117,11 +119,6 @@ router.get("/mascotas/mascotaEncontrada", async (req, res) => {
     })
 })
 
-
-
-
-
-
 router.post("/mascotas/nuevaMascotaPerdida", upload.single('file'), async (req, res) => {
     console.log(req.body)
     console.log(req.headers)
@@ -140,9 +137,25 @@ router.post("/mascotas/nuevaMascotaPerdida", upload.single('file'), async (req, 
         latEncontrada: req.headers.lng
     });
     res.status(200).send()
- 
+
 
 })
+router.post("/mascotas/mascotaEncontrada/:id", upload.single('file'), async (req, res) => {
+    console.log(req.body)
+    console.log(req.headers)
+
+     Mascota.update({
+
+        status: 0,
+    }, {
+        where: { idMascota: req.params.id }
+    }
+    );
+    res.status(200).send() 
+
+
+})
+
 
 module.exports = router;
 
