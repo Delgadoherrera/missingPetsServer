@@ -27,17 +27,18 @@ const upload = multer({ storage })
 
 
 router.post("/mascota/register", upload.single('file'), async (req, res) => {
-    console.log(req.body)
-    console.log(req.headers)
+    let sent = JSON.parse(req.body.formDatas)
+    console.log(sent.colorPrimario)
+
     await Mascota.create({
-        nombre: req.headers.nombre,
-        idHumano: req.headers.id,
-        colorPrimario: req.headers.colorprimario,
-        colorSecundario: req.headers.colorsecundario,
-        pesoAproximado: req.headers.pesoaproximado,
+        nombre: sent.nombre,
+        idHumano: sent.id,
+        colorPrimario: sent.colorPrimario,
+        colorSecundario: sent.colorSecundario,
+        pesoAproximado: sent.pesoAproximado,
         status: 0,
-        tipoMascota: req.headers.tipomascota,
-        descripcion: req.headers.descripcionmascota,
+        tipoMascota: sent.tipoMascota,
+        descripcion: sent.descripcionMascota,
         fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
     });
     res.status(200).send()
@@ -47,8 +48,8 @@ router.get("/mascotas/getById/:id", async (req, res) => {
     console.log(req.body)
     await Mascota.findAll({
         where: {
-            /*  idHumano: req.params.id, */
-            /*   status:{[Op.ne]:1} */
+            idHumano: req.params.id,
+            status: { [Op.ne]: 3 }
 
 
         }
@@ -58,9 +59,9 @@ router.get("/mascotas/getById/:id", async (req, res) => {
 })
 
 router.post("/mascotas/mascotaPerdida/:id", async (req, res) => {
-    console.log(req.body)
-    console.log(req.params.id)
-
+/*     console.log('mascota nueva con location default')
+    console.log(req.body.latitude)
+    console.log(req.params.id) */
     Mascota.update({
         latPerdida: req.body.latitude,
         lngPerdida: req.body.longitude,
@@ -69,22 +70,35 @@ router.post("/mascotas/mascotaPerdida/:id", async (req, res) => {
     }, {
         where: { idMascota: req.params.id }
     }
-
     ).catch(error => res.send(error))
-
     res.status(200).send()
-
-
 })
+
+router.post("/mascotas/mascotaPerdidaNewLocation/:id", async (req, res) => {
+/*  console.log('mascota con nueva location') */
+
+   
+    Mascota.update({
+        latPerdida: req.body[req.body.length-1].latitude,
+        lngPerdida: req.body[req.body.length-1].longitude, 
+        status: 1
+
+    }, {
+        where: { idMascota: req.params.id }
+    }
+    ).catch(error => res.send(error))
+    res.status(200).send()
+})
+
+
+
 
 router.get("/mascotas/mascotasPerdidas", async (req, res) => {
     console.log(req.body)
     console.log(req.params.id)
 
     Mascota.findAll({
-        where: {
-            status: 1,
-        }
+        where: { status: { [Op.in]: [1, 3] }, }
     }).then(function (mascotas) {
         if (mascotas) {
             return res.status(200).send({ data: mascotas })
@@ -121,22 +135,25 @@ router.get("/mascotas/mascotaEncontrada", async (req, res) => {
 
 router.post("/mascotas/nuevaMascotaPerdida", upload.single('file'), async (req, res) => {
     console.log(req.body)
-    console.log(req.headers)
+    let sent = JSON.parse(req.body.formDatas)
+    console.log(sent.colorPrimario)
 
     await Mascota.create({
-        nombre: 'Esta mascota fue encontrada sin nombre',
-        idHumano: req.headers.id,
-        colorPrimario: req.headers.colorprimario,
-        colorSecundario: req.headers.colorsecundario,
-        pesoAproximado: req.headers.pesoaproximado,
-        status: 1,
-        tipoMascota: req.headers.tipomascota,
-        descripcion: req.headers.descripcionmascota,
+        /*   nombre: sent.nombre, */
+        idHumano: sent.id,
+        colorPrimario: sent.colorPrimario,
+        colorSecundario: sent.colorSecundario,
+        pesoAproximado: sent.pesoAproximado,
+        status: 3,
+        tipoMascota: sent.tipoMascota,
+        descripcion: sent.descripcionMascota,
         fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
-        latEncontrada: req.headers.lat,
-        latEncontrada: req.headers.lng
+        latEncontrada: sent.lat,
+        lngEncontrada: sent.lng
     });
     res.status(200).send()
+
+
 
 
 })
@@ -144,14 +161,16 @@ router.post("/mascotas/mascotaEncontrada/:id", upload.single('file'), async (req
     console.log(req.body)
     console.log(req.headers)
 
-     Mascota.update({
+    Mascota.update({
 
         status: 0,
+        latPerdida: 0,
+        lngPerdida: 0.
     }, {
         where: { idMascota: req.params.id }
     }
     );
-    res.status(200).send() 
+    res.status(200).send()
 
 
 })
