@@ -59,9 +59,9 @@ router.get("/mascotas/getById/:id", async (req, res) => {
 })
 
 router.post("/mascotas/mascotaPerdida/:id", async (req, res) => {
-/*     console.log('mascota nueva con location default')
-    console.log(req.body.latitude)
-    console.log(req.params.id) */
+    /*     console.log('mascota nueva con location default')
+        console.log(req.body.latitude)
+        console.log(req.params.id) */
     Mascota.update({
         latPerdida: req.body.latitude,
         lngPerdida: req.body.longitude,
@@ -75,12 +75,12 @@ router.post("/mascotas/mascotaPerdida/:id", async (req, res) => {
 })
 
 router.post("/mascotas/mascotaPerdidaNewLocation/:id", async (req, res) => {
-/*  console.log('mascota con nueva location') */
+    /*  console.log('mascota con nueva location') */
 
-   
+
     Mascota.update({
-        latPerdida: req.body[req.body.length-1].latitude,
-        lngPerdida: req.body[req.body.length-1].longitude, 
+        latPerdida: req.body[req.body.length - 1].latitude,
+        lngPerdida: req.body[req.body.length - 1].longitude,
         status: 1
 
     }, {
@@ -137,21 +137,43 @@ router.post("/mascotas/nuevaMascotaPerdida", upload.single('file'), async (req, 
     console.log(req.body)
     let sent = JSON.parse(req.body.formDatas)
     console.log(sent.colorPrimario)
+    if (sent.newLatitude) {
+        await Mascota.create({
+            /*   nombre: sent.nombre, */
+            idHumano: sent.id,
+            colorPrimario: sent.colorPrimario,
+            colorSecundario: sent.colorSecundario,
+            pesoAproximado: sent.pesoAproximado,
+            status: 3,
+            tipoMascota: sent.tipoMascota,
+            descripcion: sent.descripcionMascota,
+            fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
+            latEncontrada: sent.newLatitude,
+            lngEncontrada: sent.newLongitude,
 
-    await Mascota.create({
-        /*   nombre: sent.nombre, */
-        idHumano: sent.id,
-        colorPrimario: sent.colorPrimario,
-        colorSecundario: sent.colorSecundario,
-        pesoAproximado: sent.pesoAproximado,
-        status: 3,
-        tipoMascota: sent.tipoMascota,
-        descripcion: sent.descripcionMascota,
-        fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
-        latEncontrada: sent.lat,
-        lngEncontrada: sent.lng
-    });
-    res.status(200).send()
+
+        });
+        res.status(200).send()
+
+    }
+    else {
+        await Mascota.create({
+            /*   nombre: sent.nombre, */
+            idHumano: sent.id,
+            colorPrimario: sent.colorPrimario,
+            colorSecundario: sent.colorSecundario,
+            pesoAproximado: sent.pesoAproximado,
+            status: 3,
+            tipoMascota: sent.tipoMascota,
+            descripcion: sent.descripcionMascota,
+            fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
+            latEncontrada: sent.initialLatitude,
+            lngEncontrada: sent.initialLongitude,
+
+
+        });
+        res.status(200).send()
+    }
 
 
 
