@@ -26,6 +26,28 @@ const storage = multer.diskStorage({
 const upload = multer({ storage })
 
 
+const gradosARadianes = (grados) => {
+    return grados * Math.PI / 180;
+};
+
+const distanciaCoords = (lat1, lon1, lat2, lon2) => {
+
+    lat1 = gradosARadianes(lat1);
+    lon1 = gradosARadianes(lon1);
+    lat2 = gradosARadianes(lat2);
+    lon2 = gradosARadianes(lon2);
+
+    const radioTierra = 6371;
+    let difLng = (lon2 - lon1);
+    let difLat = (lat2 - lat1);
+    let a = Math.pow(Math.sin(difLat / 2.0), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(difLng / 2.0), 2);
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return radioTierra * c;
+};
+
+
+
+
 router.post("/mascota/register", upload.single('file'), async (req, res) => {
     let sent = JSON.parse(req.body.formDatas)
     console.log(sent.colorPrimario)
@@ -90,22 +112,40 @@ router.post("/mascotas/mascotaPerdidaNewLocation/:id", async (req, res) => {
     res.status(200).send()
 })
 
-
-
-
 router.get("/mascotas/mascotasPerdidas", async (req, res) => {
-    console.log(req.body)
-    console.log(req.params.id)
+    let latitud = req.headers.latitude
+    let longitud = req.headers.longitude
+    console.log(latitud)
+    console.log(longitud)
+    const mascotasCercanas = []
+
+
+
 
     Mascota.findAll({
         where: { status: { [Op.in]: [1, 3] }, }
     }).then(function (mascotas) {
         if (mascotas) {
-            return res.status(200).send({ data: mascotas })
+
+
+            mascotas.forEach((j) => {
+                let distance = distanciaCoords(latitud, longitud, j.latPerdida, j.lngPerdida)
+
+                if (distance < 1) {
+                    /* console.log(j.nombre, 'esta cerca!') */
+                    mascotasCercanas.push(j)
+                }
+                else {
+                    console.log('aun no hay mascotas cerca')
+                }
+
+                /* console.log('distance', distance) */
+            })
+            return res.status(200).send({ data: mascotasCercanas })
         }
         else if (!mascotas) {
             console.log('No hay mascotas perdidas actualmente en tu zona.')
-            return res.status(400)
+            /*         return res.status(400) */
         }
     }).catch((error) => {
         console.log('error catch' + error)
@@ -148,8 +188,8 @@ router.post("/mascotas/nuevaMascotaPerdida", upload.single('file'), async (req, 
             tipoMascota: sent.tipoMascota,
             descripcion: sent.descripcionMascota,
             fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
-            latEncontrada: sent.newLatitude,
-            lngEncontrada: sent.newLongitude,
+            latPerdida: sent.newLatitude,
+            lngPerdida: sent.newLongitude,
 
 
         });
