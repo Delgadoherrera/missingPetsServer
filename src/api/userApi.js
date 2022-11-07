@@ -80,7 +80,7 @@ router.post("/user/login", async (req, res) => {
 )
 
 router.post("/user/register", async (req, res) => {
-    console.log(req.body)
+ 
     await Humano.create({
         nombre: req.body.name,
         apellido: req.body.apellido,
@@ -91,6 +91,25 @@ router.post("/user/register", async (req, res) => {
     });
 })
 
+
+router.get("/user/userDetail/:id", async (req, res) => {
+    console.log('REQODY', req.params.id)
+     Humano.findAll({
+        where: {
+            idHumano: req.params.id,
+        }
+    }).then(function (humano) {
+        if (humano) {
+            return res.status(200).send({ data: humano })
+        }
+        else if (!humano) {
+            console.log('No se han encontrado mascotas perdidas por tu zona')
+            return res.status(400)
+        }
+    }).catch((error) => {
+        console.log('error catch' + error)
+    }) 
+})
 
 
 module.exports = router;

@@ -72,8 +72,6 @@ router.get("/mascotas/getById/:id", async (req, res) => {
         where: {
             idHumano: req.params.id,
             status: { [Op.ne]: 3 }
-
-
         }
     }).then(await function (mascotas) {
         return res.status(200).send({ data: mascotas })
