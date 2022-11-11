@@ -32,6 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors())
 
 
+console.log('Verificar PORT socket')
 server.listen(4000);
 
 app.use('/', userApi);
