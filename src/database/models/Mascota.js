@@ -19,7 +19,7 @@ module.exports = (sequelize, dataTypes) => {
             type: dataTypes.STRING
         },
         fotoMascota: {
-            type: dataTypes.STRING
+            type: dataTypes.BLOB('medium')
         },
         colorPrimario: {
             type: dataTypes.STRING

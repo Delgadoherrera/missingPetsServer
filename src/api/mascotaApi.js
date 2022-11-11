@@ -49,9 +49,9 @@ const distanciaCoords = (lat1, lon1, lat2, lon2) => {
 
 
 router.post("/mascota/register", upload.single('file'), async (req, res) => {
-    let sent = JSON.parse(req.body.formDatas)
-    console.log(sent.colorPrimario)
-
+    /*     let sent = JSON.parse(req.body.formDatas) */
+    console.log(req.body.formdata)
+    let sent = (req.body.formdata)
     await Mascota.create({
         nombre: sent.nombre,
         idHumano: sent.id,
@@ -61,7 +61,7 @@ router.post("/mascota/register", upload.single('file'), async (req, res) => {
         status: 0,
         tipoMascota: sent.tipoMascota,
         descripcion: sent.descripcionMascota,
-        fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
+        fotoMascota: req.body.file.base64Data
     });
     res.status(200).send()
 })
@@ -152,7 +152,7 @@ router.get("/mascotas/mascotasPerdidas", async (req, res) => {
 
 router.get("/mascotas/mascotaEncontrada", async (req, res) => {
     console.log(req.body)
-    console.log(req.params.id)
+    console.log(req.params.file.base64Data)
 
     MascotaEncontrada.findAll({
         where: {
@@ -173,11 +173,14 @@ router.get("/mascotas/mascotaEncontrada", async (req, res) => {
 
 router.post("/mascotas/nuevaMascotaPerdida", upload.single('file'), async (req, res) => {
     console.log(req.body)
-    let sent = JSON.parse(req.body.formDatas)
+
+
+
+    let sent = req.body.formDatas
     console.log(sent.colorPrimario)
     if (sent.newLatitude) {
         await Mascota.create({
-            /*   nombre: sent.nombre, */
+
             idHumano: sent.id,
             colorPrimario: sent.colorPrimario,
             colorSecundario: sent.colorSecundario,
@@ -185,7 +188,7 @@ router.post("/mascotas/nuevaMascotaPerdida", upload.single('file'), async (req, 
             status: 3,
             tipoMascota: sent.tipoMascota,
             descripcion: sent.descripcionMascota,
-            fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
+            fotoMascota: req.body.file.base64Data,
             latPerdida: sent.newLatitude,
             lngPerdida: sent.newLongitude,
 
@@ -196,7 +199,7 @@ router.post("/mascotas/nuevaMascotaPerdida", upload.single('file'), async (req, 
     }
     else {
         await Mascota.create({
-            /*   nombre: sent.nombre, */
+
             idHumano: sent.id,
             colorPrimario: sent.colorPrimario,
             colorSecundario: sent.colorSecundario,
@@ -204,16 +207,16 @@ router.post("/mascotas/nuevaMascotaPerdida", upload.single('file'), async (req, 
             status: 3,
             tipoMascota: sent.tipoMascota,
             descripcion: sent.descripcionMascota,
-            fotoMascota: 'http://localhost:3001//img/pets/' + req.session.newFileName,
-            latEncontrada: sent.initialLatitude,
-            lngEncontrada: sent.initialLongitude,
+            fotoMascota: req.body.file.base64Data,
+            latPerdida: sent.initialLatitude,
+            lngPerdida: sent.initialLongitude,
 
 
         });
         res.status(200).send()
     }
 
-
+ 
 
 
 })
