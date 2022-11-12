@@ -79,9 +79,6 @@ router.get("/mascotas/getById/:id", async (req, res) => {
 })
 
 router.post("/mascotas/mascotaPerdida/:id", async (req, res) => {
-    /*     console.log('mascota nueva con location default')
-        console.log(req.body.latitude)
-        console.log(req.params.id) */
     Mascota.update({
         latPerdida: req.body.latitude,
         lngPerdida: req.body.longitude,
